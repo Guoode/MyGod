@@ -1,13 +1,17 @@
 <template>
   <div class="log-container">
     <div v-for="(logEntry, index) in logEntries" :key="index" class="log-entry">
-      <div class="log-item time">{{ logEntry.time }}</div>
-      <div class="log-item device-id">{{ logEntry.deviceId }}</div>
-      <div class="log-item battery-level">{{ logEntry.batteryLevel }}%</div>
-      <div class="log-item oxygen-level">{{ logEntry.oxygenLevel }}%</div>
-      <div class="log-item temperature">{{ logEntry.temperature }}°C</div>
-      <div class="log-item ph-value">{{ logEntry.phValue }}</div>
-      <div class="log-item coordinates">{{ logEntry.coordinates }}</div>
+      <div class="log-row">
+        <div class="log-item time">{{ logEntry.time }}</div>
+        <div class="log-item device-id">{{ logEntry.deviceId }}</div>
+        <div class="log-item battery-level">{{ logEntry.batteryLevel }}%</div>
+        <div class="log-item oxygen-level">{{ logEntry.oxygenLevel }}%</div>
+      </div>
+      <div class="log-row">
+        <div class="log-item temperature">{{ logEntry.temperature }}°C</div>
+        <div class="log-item ph-value">{{ logEntry.phValue }}</div>
+        <div class="log-item coordinates">{{ logEntry.coordinates }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -49,42 +53,17 @@ export default {
 }
 
 .log-entry {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   border-bottom: 1px solid #ccc;
   padding: 8px 0;
 }
 
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .log-item {
-  /* 样式根据需要添加 */
-}
-
-.time {
-  /* 样式根据需要添加 */
-}
-
-.device-id {
-  /* 样式根据需要添加 */
-}
-
-.battery-level {
-  /* 样式根据需要添加 */
-}
-
-.oxygen-level {
-  /* 样式根据需要添加 */
-}
-
-.temperature {
-  /* 样式根据需要添加 */
-}
-
-.ph-value {
-  /* 样式根据需要添加 */
-}
-
-.coordinates {
   /* 样式根据需要添加 */
 }
 </style>
