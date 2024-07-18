@@ -3,7 +3,7 @@
 </template>
 <script>
 export default {
-  name: "map",
+  name: "maps",
   data() {
     return {
       msg: "地图",
