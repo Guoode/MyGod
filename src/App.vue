@@ -8,24 +8,24 @@
         <div class="flex-1 mr-2 flex flex-col">
           <maps class="bg-opacity-50 bg-slate-800 p-3 mt-2 flex-1" />
         </div>
-        <div
-          class="w-1/3 ml-5 bg-opacity-50 bg-slate-800 p-3 flex flex-col h-full"
-        >
-          <log class="h-full box-border pb-4" />
+        <div class="flex flex-col w-1/4">
+          <div class="flex-1" style="display: flex; flex-direction: column">
+            <minmap class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
+            <log class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
+          </div>
         </div>
       </div>
     </div>
     <bottom class="mt-2" />
   </div>
 </template>
-
 <script setup>
 import top from "./components/top.vue"; // 顶部
 import maps from "./components/maps.vue"; // 地图
 import log from "./components/log.vue"; // 日志
+import minmap from "./components/minmap.vue";
 import bottom from "./components/bottom.vue"; // 底部
 </script>
-
 <style scoped>
 /* 在这里可以添加样式，根据需要进行调整 */
 </style>
