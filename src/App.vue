@@ -10,8 +10,8 @@
         </div>
         <div class="flex flex-col w-1/4">
           <div class="flex-1" style="display: flex; flex-direction: column">
-            <minmap class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
-            <logw class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
+            <taint class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
+            <log class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
           </div>
         </div>
       </div>
@@ -22,8 +22,8 @@
 <script setup>
 import top from "./components/top.vue"; // 顶部
 import maps from "./components/maps.vue"; // 地图
-import logw from "./components/logw.vue"; // 日志
-import minmap from "./components/minmap.vue";
+import log from "./components/log.vue"; // 日志
+import taint from "./components/taint.vue";
 import bottom from "./components/bottom.vue"; // 底部
 </script>
 <style scoped>
