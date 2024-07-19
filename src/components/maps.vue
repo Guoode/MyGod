@@ -22,7 +22,12 @@
         <bm-label
           :content="device.name"
           :labelStyle="{
-            color: device.status === '正常' ? 'green' : 'red',
+            color:
+              device.status === '正常'
+                ? 'green'
+                : device.status === '警告'
+                ? 'yellow'
+                : 'red',
             fontSize: '12px',
           }"
           :offset="{ width: 20, height: -10 }"
@@ -54,7 +59,7 @@ export default {
     },
     generateDevices(count) {
       const bounds = this.getBoundsHubei();
-      const statuses = ["正常", "警告", "离线"];
+      const statuses = ["正常", "警告", "故障"];
       for (let i = 0; i < count; i++) {
         this.devices.push({
           id: i + 1,
