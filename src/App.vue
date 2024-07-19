@@ -12,11 +12,11 @@
           <div class="flex-1" style="display: flex; flex-direction: column">
             <taint
               class="bg-opacity-50 bg-slate-800 p-3 flex-1"
-              style="height: 50%"
+              style="height: 70%"
             />
             <log
               class="bg-opacity-50 bg-slate-800 p-3 flex-1"
-              style="height: 50%"
+              style="height: 30%"
             />
           </div>
         </div>
