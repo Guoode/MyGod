@@ -3,14 +3,21 @@
     <div v-for="(logEntry, index) in logEntries" :key="index" class="log-entry">
       <div class="log-row">
         <div class="log-item time">{{ logEntry.time }}</div>
+        <!--时间-->
         <div class="log-item device-id">{{ logEntry.deviceId }}</div>
+        <!--编号-->
         <div class="log-item battery-level">{{ logEntry.batteryLevel }}%</div>
+        <!--电量-->
         <div class="log-item oxygen-level">{{ logEntry.oxygenLevel }}%</div>
+        <!--含氧量-->
       </div>
       <div class="log-row">
         <div class="log-item temperature">{{ logEntry.temperature }}°C</div>
+        <!--温度-->
         <div class="log-item ph-value">{{ logEntry.phValue }}</div>
+        <!--ph值-->
         <div class="log-item coordinates">{{ logEntry.coordinates }}</div>
+        <!--坐标-->
       </div>
     </div>
   </div>
