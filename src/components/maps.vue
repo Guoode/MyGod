@@ -22,12 +22,7 @@
         <bm-label
           :content="device.name"
           :labelStyle="{
-            color:
-              device.status === '正常'
-                ? 'green'
-                : device.status === '警告'
-                ? 'yellow'
-                : 'red',
+            color: getMarkerColor(device.status),
             fontSize: '12px',
           }"
           :offset="{ width: 20, height: -10 }"
@@ -38,73 +33,112 @@
 </template>
 
 <script>
+import { onMounted, ref, computed } from "vue";
+
+const DEVICE_STATUS_COLORS = {
+  正常: "green",
+  警告: "orange",
+  故障: "red",
+};
+
 export default {
-  data() {
-    return {
-      centerLng: 114.3, // 湖北省中心经度
-      centerLat: 30.6, // 湖北省中心纬度
-      devices: [],
+  setup() {
+    const centerLng = ref(114.3);
+    const centerLat = ref(30.6);
+    const devices = ref([]);
+    let map = null;
+
+    onMounted(() => {
+      generateDevices(50);
+    });
+
+    // 使用 computed 计算湖北省边界
+    const hubeiBounds = computed(() => ({
+      minX: 108.9,
+      maxX: 116.05,
+      minY: 29.3,
+      maxY: 33.15,
+    }));
+
+    const mapReady = ({ BMap, map: mapInstance }) => {
+      map = mapInstance;
     };
-  },
-  mounted() {
-    this.generateDevices(50);
-  },
-  methods: {
-    mapReady({ BMap, map }) {
-      this.map = map;
-    },
-    locationSuccess(e) {
-      this.centerLng = e.point.lng;
-      this.centerLat = e.point.lat;
-    },
-    generateDevices(count) {
-      const bounds = this.getBoundsHubei();
-      const statuses = ["正常", "警告", "故障"];
+
+    const locationSuccess = (e) => {
+      centerLng.value = e.point.lng;
+      centerLat.value = e.point.lat;
+    };
+
+    const generateDevices = (count) => {
+      const { minX, maxX, minY, maxY } = hubeiBounds.value;
+      const statuses = Object.keys(DEVICE_STATUS_COLORS);
+
       for (let i = 0; i < count; i++) {
-        this.devices.push({
+        devices.value.push({
           id: i + 1,
           name: `设备${i + 1}`,
-          lng: Math.random() * (bounds.maxX - bounds.minX) + bounds.minX,
-          lat: Math.random() * (bounds.maxY - bounds.minY) + bounds.minY,
+          lng: Math.random() * (maxX - minX) + minX,
+          lat: Math.random() * (maxY - minY) + minY,
           status: statuses[Math.floor(Math.random() * statuses.length)],
           battery: Math.floor(Math.random() * 100),
-          meid: `MEID${i + 1}`, // 添加 MEID 属性
-          mobile: `1380${i + 1}`, // 添加手机号属性
+          mobile: `10086${i + 1}`,
           osVersion: `v${Math.floor(Math.random() * 5)}.${Math.floor(
             Math.random() * 10
-          )}`, // 添加版本属性
-          perCpu: `${Math.floor(Math.random() * 100)}%`, // 添加 CPU 性能属性
-          perRam: `${Math.floor(Math.random() * 100)}%`, // 添加 RAM 性能属性
-          perDisk: `${Math.floor(Math.random() * 100)}%`, // 添加 DISK 性能属性
+          )}`,
+          temperature: `${Math.floor(Math.random() * 20) + 20}°C`,
+          phValue: `${(Math.random() * 5 + 6).toFixed(1)}`,
+          oxygenSaturation: `${(Math.random() * 10 + 90).toFixed(1)}%`,
+          // 初始化位置信息为空
+          location: "",
         });
       }
-    },
-    getBoundsHubei() {
-      return {
-        minX: 108.9,
-        maxX: 116.05,
-        minY: 29.3,
-        maxY: 33.15,
-      };
-    },
-    openInfoWindow(device) {
+    };
+
+    const openInfoWindow = (device) => {
       const opts = {
-        width: 300, // 信息窗口宽度
-        height: 150, // 信息窗口高度
-        title: "设备信息", // 信息窗口标题
-        message: "",
+        width: 350,
+        height: 230, // 调整高度以适应新增信息
+        title: "设备信息",
       };
-      const infoWindowContent = `
-        <span style='display:inline-block;width:60px; text-align: right;font-weight:700'>MEID：</span>${device.meid}<br/>
-        <span style='display:inline-block;width:60px; text-align: right;font-weight:700'>设备编号：</span>${device.mobile}<br/>
-        <span style='display:inline-block;width:60px; text-align: right;font-weight:700'>状态：</span>${device.status}<br/>
-        <span style='display:inline-block;width:60px; text-align: right;font-weight:700'>版本：</span>${device.osVersion}<br/>
-        <span style='display:inline-block;width:60px; text-align: right;font-weight:700'>性能：</span>CPU: ${device.perCpu} RAM: ${device.perRam} DISK: ${device.perDisk}
-      `;
+
+      // 使用百度地图逆地理编码服务获取位置信息
+      const geocoder = new BMap.Geocoder();
       const point = new BMap.Point(device.lng, device.lat);
-      const infoWindow = new BMap.InfoWindow(infoWindowContent, opts);
-      this.map.openInfoWindow(infoWindow, point);
-    },
+      geocoder.getLocation(point, (rs) => {
+        const addComp = rs.addressComponents;
+        device.location = `${addComp.province}${addComp.city}${addComp.district}${addComp.street}${addComp.streetNumber}`;
+
+        // 在获取到位置信息后创建信息窗口
+        const infoWindowContent = `
+          <div class="info-window">
+            <div><span>名称：</span>${device.name}</div>
+            <div><span>电量：</span>${device.battery}%</div>
+            <div><span>状态：</span>${device.status}</div>
+            <div><span>版本：</span>${device.osVersion}</div>
+            <div><span>温度：</span>${device.temperature}</div>
+            <div><span>PH：</span>${device.phValue}</div>
+            <div><span>含氧：</span>${device.oxygenSaturation}</div>
+            <div><span>位置：</span>${device.location}</div>
+          </div>
+        `;
+        const infoWindow = new BMap.InfoWindow(infoWindowContent, opts);
+        map.openInfoWindow(infoWindow, point);
+      });
+    };
+
+    const getMarkerColor = (status) => {
+      return DEVICE_STATUS_COLORS[status] || "gray";
+    };
+
+    return {
+      centerLng,
+      centerLat,
+      devices,
+      mapReady,
+      locationSuccess,
+      openInfoWindow,
+      getMarkerColor,
+    };
   },
 };
 </script>
@@ -118,5 +152,21 @@ export default {
 .map {
   width: 100%;
   height: 100%;
+}
+
+/* 优化信息窗口样式 */
+.info-window {
+  font-size: 14px;
+}
+
+.info-window div {
+  margin-bottom: 5px;
+}
+
+.info-window span {
+  display: inline-block;
+  width: 60px;
+  text-align: right;
+  font-weight: 700;
 }
 </style>
