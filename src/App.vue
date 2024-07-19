@@ -10,8 +10,14 @@
         </div>
         <div class="flex flex-col w-1/4">
           <div class="flex-1" style="display: flex; flex-direction: column">
-            <taint class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
-            <log class="bg-opacity-50 bg-slate-800 p-3 flex-1" />
+            <taint
+              class="bg-opacity-50 bg-slate-800 p-3 flex-1"
+              style="height: 50%"
+            />
+            <log
+              class="bg-opacity-50 bg-slate-800 p-3 flex-1"
+              style="height: 50%"
+            />
           </div>
         </div>
       </div>
