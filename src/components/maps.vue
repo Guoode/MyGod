@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, getCurrentInstance } from "vue";
 
 const DEVICE_STATUS_COLORS = {
   正常: "green",
@@ -47,6 +47,7 @@ export default {
     const centerLat = ref(30.6);
     const devices = ref([]);
     let map = null;
+    const { emit } = getCurrentInstance();
 
     onMounted(() => {
       generateDevices(50);
@@ -123,6 +124,9 @@ export default {
         `;
         const infoWindow = new BMap.InfoWindow(infoWindowContent, opts);
         map.openInfoWindow(infoWindow, point);
+
+        // 将位置信息通过emit方法传递给父组件
+        emit("locationSelected", device.location);
       });
     };
 
