@@ -3,7 +3,11 @@
     <div
       class="bg-[url('assets/imgs/bg.jpg')] bg-cover bg-center min-h-screen text-white p-2 flex flex-col flex-grow"
     >
-      <top class="bg-opacity-50 bg-slate-800 p-3 h-1/4 w-full" />
+      <top
+        class="bg-opacity-50 bg-slate-800 p-3 h-1/4 w-full"
+        :deviceCount="deviceCount"
+        :onlineDeviceCount="onlineDeviceCount"
+      />
       <div class="flex flex-1 mt-2 flex-grow">
         <div class="flex-1 mr-2 flex flex-col">
           <maps
@@ -32,6 +36,7 @@
     <bottom class="mt-2" />
   </div>
 </template>
+
 <script>
 import top from "./components/top.vue"; // 顶部
 import maps from "./components/maps.vue"; // 地图
@@ -53,6 +58,9 @@ export default {
     const devices = ref([]);
     const centerLng = ref(114.3);
     const centerLat = ref(30.6);
+    const deviceCount = 100; // 设备总量
+    const onlineDeviceCount = ref(0); // 在线设备数量
+
     const generateData = () => {
       const phValue = (Math.random() * 2 + 6).toFixed(1); // 生成一个新的 pH 值，范围在 6 到 8 之间
       const temperature = `${Math.floor(Math.random() * 15) + 15}°C`; // 生成一个新的温度值，范围在 15 到 30 之间
@@ -78,16 +86,29 @@ export default {
         oxygenSaturation,
         waterCondition,
       });
+
+      // 更新在线设备数量
+      onlineDeviceCount.value = devices.value.filter(
+        (device) => device.status !== "严重"
+      ).length;
     };
 
     // 使用 setInterval 函数设置一个定时器，每隔 3000 毫秒（即 3 秒）调用一次 generateData 函数
     // 这样可以模拟数据随时间变化的效果
     setInterval(generateData, 3000);
 
-    return { devices, centerLng, centerLat, location };
+    return {
+      devices,
+      centerLng,
+      centerLat,
+      location,
+      deviceCount,
+      onlineDeviceCount,
+    };
   },
 };
 </script>
+
 <style scoped>
 /* 在这里可以添加样式，根据需要进行调整 */
 </style>

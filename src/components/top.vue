@@ -13,23 +13,24 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
+
 export default {
   name: "TopBar",
-  data() {
-    return {
-      deviceCount: 150, // 模拟设备数量
-      onlineDeviceCount: 100, // 模拟在线设备数量
-      currentTime: "", // 当前时间
-    };
+  props: {
+    deviceCount: {
+      type: Number,
+      required: true,
+    },
+    onlineDeviceCount: {
+      type: Number,
+      required: true,
+    },
   },
-  mounted() {
-    // 在组件挂载后启动计时器
-    setInterval(() => {
-      this.updateTime();
-    }, 1000);
-  },
-  methods: {
-    updateTime() {
+  setup(props) {
+    const currentTime = ref("");
+
+    const updateTime = () => {
       // 获取当前时间
       const now = new Date();
       const hours = now.getHours();
@@ -42,14 +43,27 @@ export default {
       const formattedSeconds = seconds.toString().padStart(2, "0");
 
       // 更新当前时间
-      this.currentTime = `${formattedHours}.${formattedMinutes}.${formattedSeconds}`;
-    },
-  },
-  computed: {
-    deviceColor() {
+      currentTime.value = `${formattedHours}.${formattedMinutes}.${formattedSeconds}`;
+    };
+
+    onMounted(() => {
+      // 在组件挂载后启动计时器
+      setInterval(updateTime, 1000);
+    });
+
+    const deviceColor = ref("green");
+    const updateDeviceColor = () => {
       // 根据在线设备数量和设备总量动态计算颜色
-      return this.onlineDeviceCount <= this.deviceCount ? "green" : "red";
-    },
+      deviceColor.value =
+        props.onlineDeviceCount <= props.deviceCount ? "green" : "red";
+    };
+
+    onMounted(() => {
+      // 在组件挂载后启动计时器
+      setInterval(updateDeviceColor, 1000);
+    });
+
+    return { currentTime, deviceColor };
   },
 };
 </script>
