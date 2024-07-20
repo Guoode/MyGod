@@ -33,82 +33,54 @@
 </template>
 
 <script>
-import { onMounted, ref, computed, getCurrentInstance } from "vue";
+import { getCurrentInstance } from "vue";
 
 const DEVICE_STATUS_COLORS = {
-  正常: "green",
-  警告: "orange",
-  故障: "red",
+  轻微: "green",
+  中度: "orange",
+  严重: "red",
 };
 
 export default {
-  setup() {
-    const centerLng = ref(114.3);
-    const centerLat = ref(30.6);
-    const devices = ref([]);
+  props: {
+    // 接收父组件传递的设备信息和地图中心点经纬度
+    devices: {
+      type: Array,
+      default: () => [],
+    },
+    centerLng: {
+      type: Number,
+      default: 114.3,
+    },
+    centerLat: {
+      type: Number,
+      default: 30.6,
+    },
+  },
+  setup(props) {
     let map = null;
     const { emit } = getCurrentInstance();
-
-    onMounted(() => {
-      generateDevices(50);
-    });
-
-    // 使用 computed 计算湖北省边界
-    const hubeiBounds = computed(() => ({
-      minX: 108.9,
-      maxX: 116.05,
-      minY: 29.3,
-      maxY: 33.15,
-    }));
-
+    // 地图加载完成时的回调函数
     const mapReady = ({ BMap, map: mapInstance }) => {
       map = mapInstance;
     };
-
+    // 地理位置获取成功时的回调函数
     const locationSuccess = (e) => {
-      centerLng.value = e.point.lng;
-      centerLat.value = e.point.lat;
+      emit("locationSelected", e.address);
     };
-
-    const generateDevices = (count) => {
-      const { minX, maxX, minY, maxY } = hubeiBounds.value;
-      const statuses = Object.keys(DEVICE_STATUS_COLORS);
-
-      for (let i = 0; i < count; i++) {
-        devices.value.push({
-          id: i + 1,
-          name: `设备${i + 1}`,
-          lng: Math.random() * (maxX - minX) + minX,
-          lat: Math.random() * (maxY - minY) + minY,
-          status: statuses[Math.floor(Math.random() * statuses.length)],
-          battery: Math.floor(Math.random() * 100),
-          mobile: `10086${i + 1}`,
-          osVersion: `v${Math.floor(Math.random() * 5)}.${Math.floor(
-            Math.random() * 10
-          )}`,
-          temperature: `${Math.floor(Math.random() * 20) + 20}°C`,
-          phValue: `${(Math.random() * 5 + 6).toFixed(1)}`,
-          oxygenSaturation: `${(Math.random() * 10 + 90).toFixed(1)}%`,
-          // 初始化位置信息为空
-          location: "",
-        });
-      }
-    };
-
+    // 点击设备标记时打开信息窗口
     const openInfoWindow = (device) => {
       const opts = {
         width: 350,
         height: 230, // 调整高度以适应新增信息
         title: "设备信息",
       };
-
       // 使用百度地图逆地理编码服务获取位置信息
       const geocoder = new BMap.Geocoder();
       const point = new BMap.Point(device.lng, device.lat);
       geocoder.getLocation(point, (rs) => {
         const addComp = rs.addressComponents;
         device.location = `${addComp.province}${addComp.city}${addComp.district}${addComp.street}${addComp.streetNumber}`;
-
         // 在获取到位置信息后创建信息窗口
         const infoWindowContent = `
           <div class="info-window">
@@ -122,6 +94,7 @@ export default {
             <div><span>位置：</span>${device.location}</div>
           </div>
         `;
+
         const infoWindow = new BMap.InfoWindow(infoWindowContent, opts);
         map.openInfoWindow(infoWindow, point);
 
@@ -130,14 +103,12 @@ export default {
       });
     };
 
+    // 根据设备状态获取标记颜色
     const getMarkerColor = (status) => {
       return DEVICE_STATUS_COLORS[status] || "gray";
     };
 
     return {
-      centerLng,
-      centerLat,
-      devices,
       mapReady,
       locationSuccess,
       openInfoWindow,
